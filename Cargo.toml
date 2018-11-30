@@ -1,0 +1,12 @@
+[package]
+name = "advent-of-code-2018"
+version = "0.1.0"
+authors = ["Prakhar Srivastav <prsrivastav@google.com>"]
+
+[dependencies]
+itertools = "0.7"
+md5 = "0.6"
+
+[[bin]]
+name = "day01"
+path = "src/day01.rs"
