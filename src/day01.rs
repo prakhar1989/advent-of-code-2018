@@ -14,22 +14,16 @@ fn part1(input: &str) -> i32 {
 }
 
 fn part2(input: &str) -> i32 {
-    let entries: Vec<_> = input.lines()
-        .filter_map(|s| s.parse::<i32>().ok())
-        .collect();
-
     let mut last_seen = HashSet::new();
     let mut total = 0;
 
-    for x in entries.iter().cycle() {
-        total += x;
-        if last_seen.contains(&total) {
-            return total;
-        } else {
-            last_seen.insert(total);
-        }
-    }
-    total
+    input.lines()
+        .filter_map(|s| s.parse::<i32>().ok())
+        .cycle()
+        .find_map(|c| {         // find the first value that already exists
+            total += c;                     // in the set. replace returns an Option<T>
+            last_seen.replace(total)  // to indicate if the element was seen before.
+        }).unwrap()
 }
 
 #[cfg(test)]
