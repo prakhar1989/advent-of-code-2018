@@ -5,7 +5,7 @@ const INPUT: &str = include_str!("../input/day02.txt");
 fn main() {
     let lines: Vec<_> = INPUT.lines().collect();
     println!("part1: {}", part1(&lines));
-    println!("part2: {}", part2(&lines));
+    println!("part2: {:?}", part2(&lines));
 }
 
 fn part1(strs: &Vec<&str>) -> usize {
@@ -16,15 +16,15 @@ fn part1(strs: &Vec<&str>) -> usize {
     twos * threes
 }
 
-fn part2(strs: &Vec<&str>) -> String {
+fn part2(strs: &Vec<&str>) -> Option<String> {
     for (i, s1) in strs.iter().enumerate() {
         for s2 in strs[(i + 1)..].iter() {
             if differing_chars(s1, s2) {
-                return matching_chars(s1, s2);
+                return Some(matching_chars(s1, s2));
             }
         }
     }
-    String::from("")
+    None
 }
 
 fn differing_chars(s1: &str, s2: &str) -> bool {
@@ -47,12 +47,7 @@ fn to_counter(s: &str) -> HashMap<String, i32> {
 }
 
 fn has_exactly(counts: &HashMap<String, i32>, n: i32) -> bool {
-    for (_, c) in counts {
-        if *c == n {
-            return true;
-        }
-    }
-    false
+    counts.values().any(|c| *c == n)
 }
 
 #[cfg(test)]
@@ -77,6 +72,6 @@ mod tests {
         assert_eq!(differing_chars("fguij", "fghij"), true);
         assert_eq!(differing_chars("axcye", "fghij"), false);
         assert_eq!(matching_chars("fguij", "fghij"), "fgij".to_string());
-        assert_eq!(part2(&inputs), "fgij".to_string());
+        assert_eq!(part2(&inputs), Some("fgij".to_string()));
     }
 }
