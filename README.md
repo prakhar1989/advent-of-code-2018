@@ -6,7 +6,7 @@
 ### Run
 
 ```
-$ cargo run day01
+$ cargo run --bin day01
 ```
 
 ### Test
