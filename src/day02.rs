@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 
+extern crate itertools;
+
+use itertools::Itertools;
+
 const INPUT: &str = include_str!("../input/day02.txt");
 
 fn main() {
@@ -8,33 +12,35 @@ fn main() {
     println!("part2: {:?}", part2(&lines));
 }
 
-fn part1(strs: &Vec<&str>) -> usize {
-    let counters: Vec<HashMap<_, _>> = strs.iter().map(|x| to_counter(x)).collect();
+fn part1(words: &Vec<&str>) -> usize {
+    let counters: Vec<HashMap<_, _>> = words.iter().map(|x| to_counter(x)).collect();
     let twos = counters.iter().filter(|s| has_exactly(s, 2)).count();
     let threes = counters.iter().filter(|s| has_exactly(s, 3)).count();
 
     twos * threes
 }
 
-fn part2(strs: &Vec<&str>) -> Option<String> {
-    for (i, s1) in strs.iter().enumerate() {
-        for s2 in strs[(i + 1)..].iter() {
-            if differing_chars(s1, s2) {
-                return Some(matching_chars(s1, s2));
-            }
-        }
-    }
-    None
+fn part2(words: &Vec<&str>) -> Option<String> {
+    words.iter()
+        .cartesian_product(words.clone())
+        .filter(|(a, b)| *a != b)
+        .find(|(a, b)| differing_chars(a, b))
+        .map(|(x, y)| matching_chars(x, y))
 }
 
 fn differing_chars(s1: &str, s2: &str) -> bool {
-    s1.chars().zip(s2.chars()).filter(|(a, b)| a != b).count() <= 1
+    s1.chars()
+      .zip(s2.chars())
+      .filter(|(a, b)| a != b)
+      .count() <= 1
 }
 
 fn matching_chars(s1: &str, s2: &str) -> String {
-    s1.chars().zip(s2.chars()).filter(|(a, b)| a == b)
-        .map(|(a, _)| a)
-        .collect()
+    s1.chars()
+      .zip(s2.chars())
+      .filter(|(a, b)| a == b)
+      .map(|(a, _)| a)
+      .collect()
 }
 
 fn to_counter(s: &str) -> HashMap<String, i32> {
