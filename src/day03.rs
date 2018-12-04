@@ -1,5 +1,7 @@
 extern crate regex;
 use regex::Regex;
+use std::error::Error;
+use std::result;
 
 #[macro_use]
 extern crate lazy_static;
@@ -7,6 +9,7 @@ extern crate lazy_static;
 const INPUT: &str = include_str!("../input/day03.txt");
 
 type Grid = Vec<[u32; 1000]>;
+type Result<T> = result::Result<T, Box<Error>>;
 
 #[derive(Debug, PartialEq)]
 struct Claim {
@@ -18,25 +21,30 @@ struct Claim {
 }
 
 impl Claim {
-    fn from(s: &str) -> Claim {
+    fn from(s: &str) -> Result<Claim> {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"^\#(\d+) @ (\d+),(\d+): (\d+)x(\d+)$").unwrap();
         }
 
-        let captures = RE.captures(s).unwrap();
+        let captures = match RE.captures(s) {
+            Some(captures) => captures,
+            None => return Err(Box::<Error>::from(format!("invalid format for claim"))),
+        };
 
-        Claim {
-            id: captures[1].parse().expect("no id"),
-            x: captures[2].parse().expect("no x"),
-            y: captures[3].parse().expect("no y"),
-            width: captures[4].parse().expect("no width"),
-            height: captures[5].parse().expect("no height"),
-        }
+        Ok(Claim {
+            id: captures[1].parse()?,
+            x: captures[2].parse()?,
+            y: captures[3].parse()?,
+            width: captures[4].parse()?,
+            height: captures[5].parse()?,
+        })
     }
 }
 
 fn main() {
-    let claims: Vec<Claim> = INPUT.lines().map(Claim::from).collect();
+    let claims: Vec<Claim> = INPUT.lines()
+        .map(Claim::from)
+        .filter_map(Result::ok).collect();
 
     println!("Part 1: {}", part1(&claims));
     println!("Part 2: {:?}", part2(&claims));
@@ -92,7 +100,7 @@ mod tests {
     #[test]
     fn day03_claim_parsing() {
         assert_eq!(
-            Claim::from("#27 @ 355,118: 12x15"),
+            Claim::from("#27 @ 355,118: 12x15").unwrap(),
             Claim {
                 id: 27,
                 x: 355,
@@ -102,7 +110,7 @@ mod tests {
             }
         );
         assert_eq!(
-            Claim::from("#774 @ 814,799: 17x17"),
+            Claim::from("#774 @ 814,799: 17x17").unwrap(),
             Claim {
                 id: 774,
                 x: 814,
@@ -111,14 +119,16 @@ mod tests {
                 height: 17,
             }
         );
+
+        assert_eq!(Claim::from("some random string").is_err(), true);
     }
 
     #[test]
     fn day03_part1() {
         let claims = vec![
-            Claim::from("#1 @ 1,3: 4x4"),
-            Claim::from("#2 @ 3,1: 4x4"),
-            Claim::from("#3 @ 5,5: 2x2"),
+            Claim::from("#1 @ 1,3: 4x4").unwrap(),
+            Claim::from("#2 @ 3,1: 4x4").unwrap(),
+            Claim::from("#3 @ 5,5: 2x2").unwrap(),
         ];
 
         assert_eq!(part1(&claims), 4);
@@ -127,9 +137,9 @@ mod tests {
     #[test]
     fn day03_part2() {
         let claims = vec![
-            Claim::from("#1 @ 1,3: 4x4"),
-            Claim::from("#2 @ 3,1: 4x4"),
-            Claim::from("#3 @ 5,5: 2x2"),
+            Claim::from("#1 @ 1,3: 4x4").unwrap(),
+            Claim::from("#2 @ 3,1: 4x4").unwrap(),
+            Claim::from("#3 @ 5,5: 2x2").unwrap(),
         ];
 
         assert_eq!(part2(&claims), Some(3));
