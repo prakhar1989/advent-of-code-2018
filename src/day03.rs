@@ -23,14 +23,14 @@ impl Claim {
             static ref RE: Regex = Regex::new(r"^\#(\d+) @ (\d+),(\d+): (\d+)x(\d+)$").unwrap();
         }
 
-        let captures = RE.captures_iter(s).next().unwrap();
+        let captures = RE.captures(s).unwrap();
 
         Claim {
-            id: *(&captures[1].parse::<u32>().expect("no id")),
-            x: *(&captures[2].parse::<u32>().expect("no x")),
-            y: *(&captures[3].parse::<u32>().expect("no y")),
-            width: *(&captures[4].parse::<u32>().expect("no width")),
-            height: *(&captures[5].parse::<u32>().expect("no height")),
+            id: captures[1].parse().expect("no id"),
+            x: captures[2].parse().expect("no x"),
+            y: captures[3].parse().expect("no y"),
+            width: captures[4].parse().expect("no width"),
+            height: captures[5].parse().expect("no height"),
         }
     }
 }
@@ -51,7 +51,7 @@ fn build_grid(claims: &Vec<Claim>) -> Grid {
             }
         }
     }
-    
+
     grid
 }
 
@@ -70,7 +70,7 @@ fn part2(claims: &Vec<Claim>) -> Option<u32> {
         let mut nonoverlapping = true;
         for i in claim.x..(claim.x + claim.width) {
             for j in claim.y..(claim.y + claim.height) {
-                if (grid[i as usize][j as usize] > 1) {
+                if grid[i as usize][j as usize] > 1 {
                     nonoverlapping = false;
                     continue;
                 }
@@ -80,7 +80,7 @@ fn part2(claims: &Vec<Claim>) -> Option<u32> {
             return Some(claim.id);
         }
     }
-    
+
     None
 }
 
