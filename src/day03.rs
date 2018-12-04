@@ -6,7 +6,7 @@ extern crate lazy_static;
 
 const INPUT: &str = include_str!("../input/day03.txt");
 
-type Grid = [[u32; 1000]; 1000];
+type Grid = Vec<[u32; 1000]>;
 
 #[derive(Debug, PartialEq)]
 struct Claim {
@@ -43,7 +43,7 @@ fn main() {
 }
 
 fn build_grid(claims: &Vec<Claim>) -> Grid {
-    let mut grid: Grid = [[0; 1000]; 1000];
+    let mut grid: Grid = vec![[0; 1000]; 1000];
 
     for claim in claims {
         for i in claim.x..(claim.x + claim.width) {
@@ -116,11 +116,22 @@ mod tests {
     #[test]
     fn day03_part1() {
         let claims = vec![
-            Claim::from("#100 @ 1,3: 4x4"),
-            Claim::from("#2200 @ 3,1: 4x4"),
-            Claim::from("#3300 @ 5,5: 2x2"),
+            Claim::from("#1 @ 1,3: 4x4"),
+            Claim::from("#2 @ 3,1: 4x4"),
+            Claim::from("#3 @ 5,5: 2x2"),
         ];
 
-        //assert_eq!(part2(&claims), Some(3));
+        assert_eq!(part1(&claims), 4);
+    }
+
+    #[test]
+    fn day03_part2() {
+        let claims = vec![
+            Claim::from("#1 @ 1,3: 4x4"),
+            Claim::from("#2 @ 3,1: 4x4"),
+            Claim::from("#3 @ 5,5: 2x2"),
+        ];
+
+        assert_eq!(part2(&claims), Some(3));
     }
 }
