@@ -51,7 +51,7 @@ fn create_src_file(day: &str) -> std::io::Result<()> {
 const INPUT: &str = include_str!(\"../input/day{}.txt\");
 fn main() {{}}
 
-#[cfg(tests)]
+#[cfg(test)]
 mod tests {{
     #[test]
     fn some_test() {{}}
