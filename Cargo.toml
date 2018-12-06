@@ -2,6 +2,7 @@
 name = "advent-of-code-2018"
 version = "0.1.0"
 authors = ["Prakhar Srivastav <prsrivastav@google.com>"]
+edition = "2018"
 
 [dependencies]
 itertools = "0.7"
