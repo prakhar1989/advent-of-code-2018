@@ -47,8 +47,7 @@ fn create_input_file(day: &str) -> std::io::Result<()> {
 fn create_src_file(day: &str) -> std::io::Result<()> {
     let input_file_path = format!("src/day{}.rs", day);
     let src_program = format!(
-        "
-const INPUT: &str = include_str!(\"../input/day{}.txt\");
+        "const INPUT: &str = include_str!(\"../input/day{}.txt\");
 fn main() {{}}
 
 #[cfg(test)]
@@ -56,7 +55,7 @@ mod tests {{
     use super::*;
 
     #[test]
-    fn some_test() {{}}
+    fn day{}_some_test() {{}}
 }}
     ",
         day
