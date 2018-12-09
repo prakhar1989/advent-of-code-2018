@@ -9,6 +9,7 @@ const INPUT: &str = include_str!("../input/day06.txt");
 fn main() {
     let points = to_points(INPUT.trim());
     println!("Part1: {}", part1(&points));
+    println!("Part2: {}", part2(&points, 10000));
 }
 
 #[derive(Debug, PartialEq)]
@@ -45,6 +46,11 @@ impl Point {
         } else {
             Some(closest_index)
         }
+    }
+
+    /// returns the total distance from all the points
+    fn total_distance(&self, points: &Vec<Point>) -> i32 {
+        points.iter().map(|p| self.dist(p)).sum()
     }
 }
 
@@ -97,6 +103,23 @@ fn part1(points: &Vec<Point>) -> usize {
     *map.values().max().unwrap()
 }
 
+fn part2(points: &Vec<Point>, within_area: i32) -> usize {
+    let (min_x, max_x, min_y, max_y) = grid_size(points);
+
+    let mut area = 0;
+
+    for i in min_x..max_x {
+        for j in min_y..max_y {
+            let point = Point(i, j);
+            if point.total_distance(&points) < within_area {
+                area += 1;
+            }
+        }
+    }
+
+    area
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -137,6 +160,22 @@ mod tests {
         let points = to_points(INPUT.trim());
         let max_area = part1(&points);
         assert_eq!(max_area, 3223);
+    }
+
+    #[test]
+    fn day06_total_distance() {
+        let points = get_points();
+        let point = Point(4, 3);
+        assert_eq!(point.total_distance(&points), 30);
+    }
+
+    #[test]
+    fn day06_part2() {
+        let points = get_points();
+        assert_eq!(part2(&points, 32), 16);
+
+        let points = to_points(INPUT.trim());
+        assert_eq!(part2(&points, 10000), 40495);
     }
 
     fn get_points() -> Vec<Point> {
