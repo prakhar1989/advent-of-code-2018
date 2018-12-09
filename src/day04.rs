@@ -84,7 +84,8 @@ fn part2(entries: &Vec<LogEntry>) -> usize {
                 id, m,          /* most sleepy minute */
                 history[m], /* times slept */
             )
-        }).max_by_key(|(_, _, times_slept)| *times_slept)
+        })
+        .max_by_key(|(_, _, times_slept)| *times_slept)
         .unwrap();
 
     guard_id * most_sleepy_minute
@@ -111,7 +112,8 @@ impl LogEntry {
             captures[1].parse().unwrap(),
             captures[2].parse().unwrap(),
             captures[3].parse().unwrap(),
-        ).and_hms(
+        )
+        .and_hms(
             captures[4].parse().unwrap(),
             captures[5].parse().unwrap(),
             0,
