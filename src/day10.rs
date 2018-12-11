@@ -133,13 +133,6 @@ mod tests {
     }
 
     #[test]
-    fn day10_test_tick() {
-        let point = Point::from_str("position=< 20, -10> velocity=<-2,  1>");
-
-        assert_eq!(point.tick().position, Vector(18, -9));
-    }
-
-    #[test]
     fn day10_test_grid_size() {
         let points = get_test_data();
 

@@ -6,9 +6,10 @@ use std::result;
 #[macro_use]
 extern crate lazy_static;
 
+mod matrix;
+
 const INPUT: &str = include_str!("../input/day03.txt");
 
-type Grid = Vec<[u32; 1000]>;
 type Result<T> = result::Result<T, Box<Error>>;
 
 #[derive(Debug, PartialEq)]
@@ -50,13 +51,13 @@ fn main() {
     println!("Part 2: {:?}", part2(&claims));
 }
 
-fn build_grid(claims: &Vec<Claim>) -> Grid {
-    let mut grid: Grid = vec![[0; 1000]; 1000];
+fn build_grid(claims: &Vec<Claim>) -> matrix::Matrix<u32> {
+    let mut grid = matrix::Matrix::new(1000, 1000, 0);
 
     for claim in claims {
         for i in claim.x..(claim.x + claim.width) {
             for j in claim.y..(claim.y + claim.height) {
-                grid[i as usize][j as usize] += 1;
+                grid[(i as usize, j as usize)] += 1;
             }
         }
     }
@@ -67,8 +68,8 @@ fn build_grid(claims: &Vec<Claim>) -> Grid {
 fn part1(claims: &Vec<Claim>) -> u32 {
     let grid = build_grid(claims);
 
-    grid.iter()
-        .map(|row| row.iter().filter(|v| **v > 1).count())
+    grid.rows()
+        .map(|row| row.into_iter().filter(|v| **v > 1).count())
         .fold(0, |acc, val| acc + (val as u32))
 }
 
@@ -79,7 +80,7 @@ fn part2(claims: &Vec<Claim>) -> Option<u32> {
         let mut nonoverlapping = true;
         for i in claim.x..(claim.x + claim.width) {
             for j in claim.y..(claim.y + claim.height) {
-                if grid[i as usize][j as usize] > 1 {
+                if grid[(i as usize,j as usize)] > 1 {
                     nonoverlapping = false;
                     continue;
                 }
