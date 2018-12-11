@@ -58,7 +58,7 @@ mod tests {{
     fn day{}_some_test() {{}}
 }}
     ",
-        day
+        day, day
     );
     match File::open(&input_file_path) {
         Ok(_) => Ok(()),
