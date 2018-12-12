@@ -6,17 +6,17 @@ type Grid = matrix::Matrix<i32>;
 fn main() {
     let serial_number = 6392;
     let area_table = summed_area_table(&build_grid(serial_number));
-    println!("Part 1: {:?}", find_fuel_cell(&area_table, 3).0);
-    println!("Part 2: {:?}", largest_cell(&area_table));
+    println!("Part 1: {:?}", part1(&area_table, 3).0);
+    println!("Part 2: {:?}", part2(&area_table));
 }
 
-fn largest_cell(area_table: &Grid) -> (Point, usize) {
+fn part2(area_table: &Grid) -> (Point, usize) {
     let mut best_size = 1;
     let mut best_point = (0, 0);
     let mut max_power = 0;
 
     for s in 1..300 {
-        let (point, power) = find_fuel_cell(area_table, s);
+        let (point, power) = part1(area_table, s);
         if power > max_power {
             best_size = s;
             best_point = point;
@@ -52,7 +52,7 @@ fn summed_area_table(m: &Grid) -> Grid {
     table
 }
 
-fn find_fuel_cell(area_table: &Grid, size: usize) -> (Point, i32) {
+fn part1(area_table: &Grid, size: usize) -> (Point, i32) {
     let mut max_power = 0;
     let mut max_cell = (0, 0);
 
@@ -151,9 +151,15 @@ mod tests {
     }
 
     #[test]
-    fn day11_find_fuel_cell() {
+    fn day11_part1() {
         let area_table = summed_area_table(&build_grid(6392));
-        assert_eq!(find_fuel_cell(&area_table, 3).0, (20, 58));
+        assert_eq!(part1(&area_table, 3).0, (20, 58));
+    }
+
+    #[test]
+    fn day11_part2() {
+        let area_table = summed_area_table(&build_grid(6392));
+        assert_eq!(part2(&area_table), ((233, 268), 13));
     }
 
     #[test]
