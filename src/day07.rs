@@ -1,16 +1,15 @@
-use itertools::Itertools;
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::HashSet;
 #[macro_use]
 extern crate lazy_static;
 
 const INPUT: &str = include_str!("../input/day07.txt");
 fn main() {
     let steps: Vec<Dep> = INPUT.trim().lines().map(Dep::from_str).collect();
+    println!("Part 1: {}", part1(&steps));
 }
 
 type Step = char;
-type Graph = HashMap<Step, Vec<Step>>;
 
 struct Dep {
     step: Step,
@@ -26,31 +25,55 @@ impl Dep {
 
         let captures = RE.captures(s).unwrap();
         Dep {
-            step: captures[1].as_bytes()[0] as Step,
-            requirement: captures[2].as_bytes()[0] as Step,
+            step: captures[2].as_bytes()[0] as Step,
+            requirement: captures[1].as_bytes()[0] as Step,
         }
     }
 }
 
-fn build_graph(deps: &Vec<Dep>) -> Graph {
-    let mut graph = HashMap::new();
+fn part1(deps: &Vec<Dep>) -> String {
+    let steps = get_sorted_steps(&deps);
+    let mut order = vec![];
+    let mut seen = HashSet::new();
 
-    for dep in deps {
-        let edges = graph.entry(dep.step).or_insert(Vec::new());
-        edges.push(dep.requirement);
+    loop {
+        match unvisited_steps(&steps, &deps, &seen).first() {
+            None => break,
+            Some(next_step) => {
+                order.push(*next_step);
+                seen.insert(*next_step);
+            },
+        }
+    };
 
-        graph.entry(dep.requirement).or_insert(Vec::new());
-    }
-
-    graph
+    order.into_iter().collect()
 }
 
-/// returns the step with the lowest indegree. In case of a clash,
-/// orders by alphabetical ordering.
-fn lowest_indegree(graph: &Graph) -> Step {
-    //let n = graph.values().flat_map(|node| node.iter()).collect();
+fn get_sorted_steps(deps: &Vec<Dep>) -> Vec<Step> {
+    let mut steps: Vec<_> = deps
+        .iter()
+        .flat_map(|dep| vec![dep.step, dep.requirement].into_iter())
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect();
 
-    'A'
+    steps.sort();
+
+    steps
+}
+
+fn unvisited_steps(steps: &Vec<Step>, deps: &Vec<Dep>, visited: &HashSet<Step>) -> Vec<Step> {
+    steps
+        .into_iter()
+        .filter(|id| !visited.contains(id)) // not yet visited
+        .filter(|id| {
+            // all deps have been visited
+            deps.iter()
+                .filter(|d| d.step == **id)
+                .all(|d| visited.contains(&d.requirement))
+        })
+        .map(|c| *c)
+        .collect()
 }
 
 #[cfg(test)]
@@ -58,22 +81,33 @@ mod tests {
     use super::*;
 
     #[test]
-    fn day07_some_test() {
+    fn day07_to_dep() {
         let dep = Dep::from_str("Step C must be finished before step A can begin.");
-        assert_eq!(dep.step, 'C');
-        assert_eq!(dep.requirement, 'A');
+        assert_eq!(dep.step, 'A');
+        assert_eq!(dep.requirement, 'C');
     }
 
     #[test]
-    fn day07_build_graph() {
-        let graph = build_graph(&to_deps());
+    fn day07_sorted_ids() {
+        let deps = to_deps();
+        assert_eq!(get_sorted_steps(&deps), vec!['A', 'B', 'C', 'D', 'E', 'F']);
+    }
 
-        assert_eq!(graph[&'A'], vec!['B', 'D']);
-        assert_eq!(graph[&'B'], vec!['E']);
-        assert_eq!(graph[&'C'], vec!['A', 'F']);
-        assert_eq!(graph[&'D'], vec!['E']);
-        assert_eq!(graph[&'E'].is_empty(), true);
-        assert_eq!(graph[&'F'], vec!['E']);
+    #[test]
+    fn day07_unvisited_steps() {
+        let deps = to_deps();
+        let steps = vec!['A', 'B', 'C', 'D', 'E', 'F'];
+        let mut seen: HashSet<Step> = HashSet::new();
+        assert_eq!(unvisited_steps(&steps, &deps, &seen), vec!['C']);
+
+        seen.insert('C');
+        assert_eq!( unvisited_steps(&steps, &deps, &seen), vec!['A', 'F']);
+    }
+
+    #[test]
+    fn day07_part1() {
+        let deps = to_deps();
+        assert_eq!(part1(&deps), "CABDFE".to_string());
     }
 
     fn to_deps() -> Vec<Dep> {
